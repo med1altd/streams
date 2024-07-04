@@ -25,7 +25,7 @@ jobs:
         run: |
             pwd
             cd ./core/platforms/
-            python3 twitch.py livethess > ../../streams/thessaliatv.m3u8
+            python3 twitch.py livethess > ../../channel/thessaliatv.m3u8
       - name: git add
         run: |
           git add -A
