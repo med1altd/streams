@@ -2,8 +2,7 @@ name: grabbing streams
 
 on:
   schedule:
-    - cron: '*/1 * * * *'  
-  
+    - cron: '*/1 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -13,24 +12,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-       
-      - name: config
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Configure Git
         run: |
-          git config --global user.email "<>"
-          git config --global user.name "Update"
+          git config --global user.email "medialtdcontact@gmail.com"
+          git config --global user.name "med1alt"
       
-      
-      - name: grab m3u files
+      - name: Grab m3u8 files
         run: |
-            pwd
-            cd ./core/platforms/
+          cd ./core/platforms/
             python3 twitch.py livethess > ../../channel/thessaliatv.m3u8
-      - name: git add
+
+      - name: Git add, commit and push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git add -A
-          ls -la 
-          
-      - name: commit & push
-        run: |
-          git commit -m "streams updated"
+          git commit -m "Streams updated"
           git push
