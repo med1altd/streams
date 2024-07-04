@@ -47,4 +47,4 @@ jobs:
           git add .
           git commit -m "Update thessalia.m3u8"
           git remote add origin https://github.com/med1altd/channels.git  # Add public repository URL
-          git push -u origin HEAD:main  # Push to the 'main' branch of the remote repository
+          git push -u origin main
