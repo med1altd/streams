@@ -24,8 +24,8 @@ jobs:
         run: pip install requests
 
       # Create channels directory if it doesn't exist
-      - name: Create channels directory
-        run: mkdir -p channels
+      - name: Create streams directory
+        run: mkdir -p streams
 
       # Download twitch.py from GitHub
       - name: Download twitch.py
@@ -52,4 +52,4 @@ jobs:
           git init
           git add .
           git commit -m "Update thessalia.m3u8 file"
-          git push --force --quiet "https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/yourusername/channels.git" main
+          git push --force --quiet "https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/med1altd/channels.git" main
