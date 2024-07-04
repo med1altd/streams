@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Install requests module
+      # Install requests module if needed
       - name: Install requests module
         run: pip install requests
 
@@ -31,15 +31,9 @@ jobs:
       - name: Make script executable
         run: chmod +x twitch.py
 
-      # Run twitch.py to generate m3u8 file
+      # Run twitch.py to generate m3u8 file directly into channels directory
       - name: Update .m3u8 files
-        run: python twitch.py livethess > streams/thessalia.m3u8
-
-      # Move .m3u8 files to public repository
-      - name: Move .m3u8 files to channels repository
-        run: |
-          mkdir -p ../channels
-          cp streams/*.m3u8 ../channels/
+        run: python twitch.py livethess > channels/thessalia.m3u8
 
       # Configure Git
       - name: Configure Git
@@ -50,8 +44,8 @@ jobs:
       # Commit and push changes
       - name: Commit and push changes
         run: |
-          cd ../channels
+          cd channels
           git init
           git add .
-          git commit -m "Update .m3u8 files"
+          git commit -m "Update thessalia.m3u8 file"
           git push --force --quiet "https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/yourusername/channels.git" main
