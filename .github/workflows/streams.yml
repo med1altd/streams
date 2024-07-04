@@ -29,22 +29,22 @@ jobs:
           python3 twitch.py livethess > /tmp/thessalia.m3u8  # Generate .m3u8 file in /tmp
 
       - name: Ensure streams directory exists
-        run: mkdir -p streams  # Ensure 'streams' directory exists relative to the root
+        run: mkdir -p ../../channels/streams  # Ensure 'streams' directory exists relative to 'channels' repo
 
       - name: Copy m3u8 file to streams directory
         run: |
-          cp /tmp/thessalia.m3u8 streams/thessalia.m3u8
+          cp /tmp/thessalia.m3u8 ../../channels/streams/thessalia.m3u8
 
       - name: Configure Git
         run: |
           git config --global user.email "medialtdcontact@gmail.com"
           git config --global user.name "med1altd"
 
-      - name: Commit and push changes
+      - name: Commit and push changes to channels
         run: |
-          cd streams
+          cd ../../channels
           git init
           git add .
           git commit -m "Update thessalia.m3u8"
-          git remote add origin https://github.com/med1altd/channels.git  # Add remote repository URL
+          git remote add origin https://github.com/med1altd/channels.git  # Add public repository URL
           git push -u origin HEAD:main  # Push to the 'main' branch of the remote repository
