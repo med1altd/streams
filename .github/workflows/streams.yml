@@ -2,7 +2,7 @@ name: grabbing streams
 
 on:
   schedule:
-    - cron: '* */4 * * *'
+    - cron: '*/1 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,14 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      - name: Install requests
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install requests
@@ -27,15 +28,24 @@ jobs:
           git config --global user.email "medialtdcontact@gmail.com"
           git config --global user.name "med1alt"
       
-      - name: Grab m3u8 files
+      - name: Grab m3u8 URLs
+        id: grab_urls
         run: |
           cd ./core/platforms/
-          python3 twitch.py livethess > ../../channel/thessalia.m3u8
+          python3 twitch.py livethess > /tmp/thessalia.m3u8  # Save temporary .m3u8 file
+          cp /tmp/thessalia.m3u8 ../../streams/thessalia.m3u8  # Move .m3u8 file to streams directory
 
-      - name: Git add, commit and push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Clone target repository
+        uses: actions/checkout@v2
+        with:
+          repository: <med1altd>/<channels>
+          token: ${{ secrets.GH_TOKEN }}  # Ensure GH_TOKEN has repo permissions
+
+      - name: Update .m3u8 file in target repository
         run: |
-          git add -A
-          git commit -m "Streams updated"
-          git push
+          mkdir -p ./streams
+          cp ../../streams/thessaliatv.m3u8 ./streams/
+          cd ./streams
+          git add thessaliatv.m3u8
+          git commit -m "Update .m3u8 file"
+          git push origin HEAD:main
