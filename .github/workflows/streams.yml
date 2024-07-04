@@ -2,7 +2,7 @@ name: grabbing streams
 
 on:
   schedule:
-    - cron: '*/1 * * * *'
+    - cron: '* */4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
       - name: Grab m3u8 files
         run: |
           cd ./core/platforms/
-          python3 twitch.py livethess > ../../channel/thessaliatv.m3u8
+          python3 twitch.py livethess > ../../channel/thessalia.m3u8
 
       - name: Git add, commit and push
         env:
