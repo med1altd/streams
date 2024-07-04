@@ -13,27 +13,45 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Other steps for setting up Python and installing dependencies...
+      # Assuming you want to use Python 3.x
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
+      # Install requests module
+      - name: Install requests module
+        run: pip install requests
+
+      # Download twitch.py from GitHub
+      - name: Download twitch.py
+        run: curl -o twitch.py -L https://github.com/med1altd/streams/raw/main/core/platforms/twitch.py
+
+      # Make sure twitch.py has executable permissions
+      - name: Make script executable
+        run: chmod +x twitch.py
+
+      # Run twitch.py to generate m3u8 file
       - name: Update .m3u8 files
-        run: |
-          python twitch.py livethess > ../../streams/thessalia.m3u8
-          # Add more channels as needed
+        run: python twitch.py livethess > streams/thessalia.m3u8
 
-      - name: Configure Git
-        run: |
-          git config --global user.email "<your-email>"
-          git config --global user.name "GitHub Actions"
-
-      - name: Move .m3u8 files to public repository
+      # Move .m3u8 files to public repository
+      - name: Move .m3u8 files to channels repository
         run: |
           mkdir -p ../channels
-          cp ../../streams/*.m3u8 ../channels/
+          cp streams/*.m3u8 ../channels/
 
+      # Configure Git
+      - name: Configure Git
+        run: |
+          git config --global user.email "medialtdcontact@gmail.com"
+          git config --global user.name "GitHub Actions"
+
+      # Commit and push changes
       - name: Commit and push changes
         run: |
           cd ../channels
           git init
           git add .
           git commit -m "Update .m3u8 files"
-          git push --force --quiet "https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/med1altd/channels.git" main
+          git push --force --quiet "https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/yourusername/channels.git" main
