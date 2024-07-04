@@ -17,6 +17,11 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install requests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install requests
+
       - name: Configure Git
         run: |
           git config --global user.email "medialtdcontact@gmail.com"
@@ -25,7 +30,7 @@ jobs:
       - name: Grab m3u8 files
         run: |
           cd ./core/platforms/
-            python3 twitch.py livethess > ../../channel/thessaliatv.m3u8
+          python3 twitch.py livethess > ../../channel/thessaliatv.m3u8
 
       - name: Git add, commit and push
         env:
