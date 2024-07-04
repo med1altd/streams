@@ -34,7 +34,7 @@ jobs:
       # Run twitch.py to generate m3u8 file directly into channels/streams directory in public repository
       - name: Update .m3u8 files
         run: |
-          python twitch.py livethess > ../channels/streams/thessalia.m3u8
+          python twitch.py livethess > ../med1altd/channels/streams/thessalia.m3u8
           ls -la ../channels/streams  # Optional: List files in streams directory for debugging
 
       # Configure Git
