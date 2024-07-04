@@ -29,11 +29,11 @@ jobs:
           python3 twitch.py livethess > /tmp/thessaliatv.m3u8  # Generate .m3u8 file
 
       - name: Ensure streams directory exists
-        run: mkdir -p ./streams
+        run: mkdir -p streams  # Ensure 'streams' directory exists relative to the repository root
 
       - name: Copy m3u8 file to new-repo
         run: |
-          cp /tmp/thessaliatv.m3u8 ./streams/thessaliatv.m3u8
+          cp /tmp/thessaliatv.m3u8 streams/thessaliatv.m3u8  # Copy from /tmp to 'streams' directory
 
       - name: Configure Git
         run: |
@@ -42,7 +42,7 @@ jobs:
 
       - name: Commit and push changes to channels
         run: |
-          cd ./streams
+          cd streams
           git init
           git add .
           git commit -m "Update thassaliatv.m3u8"
