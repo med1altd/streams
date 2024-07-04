@@ -26,24 +26,24 @@ jobs:
       - name: Generate m3u8 file
         run: |
           cd core/platforms/
-          python3 twitch.py livethess > /tmp/thessaliatv.m3u8  # Generate .m3u8 file
+          python3 twitch.py livethess > /tmp/thessalia.m3u8  # Generate .m3u8 file in /tmp
 
       - name: Ensure streams directory exists
-        run: mkdir -p streams  # Ensure 'streams' directory exists relative to the repository root
+        run: mkdir -p streams  # Ensure 'streams' directory exists relative to the root
 
-      - name: Copy m3u8 file to new-repo
+      - name: Copy m3u8 file to streams directory
         run: |
-          cp /tmp/thessaliatv.m3u8 streams/thessaliatv.m3u8  # Copy from /tmp to 'streams' directory
+          cp /tmp/thessalia.m3u8 streams/thessalia.m3u8
 
       - name: Configure Git
         run: |
           git config --global user.email "medialtdcontact@gmail.com"
           git config --global user.name "med1altd"
 
-      - name: Commit and push changes to channels
+      - name: Commit and push changes
         run: |
           cd streams
           git init
           git add .
-          git commit -m "Update thassaliatv.m3u8"
+          git commit -m "Update thessalia.m3u8"
           git push https://github.com/med1altd/channels.git HEAD:main
