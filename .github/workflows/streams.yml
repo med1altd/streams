@@ -1,8 +1,8 @@
-name: grabbing streams
+name: Update Streams
 
 on:
   schedule:
-    - cron: '*/1 * * * *'
+    - cron: '*/1 * * * *'  # Run every 1 minute
   workflow_dispatch:
 
 jobs:
@@ -23,29 +23,27 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install requests
 
+      - name: Generate m3u8 file
+        run: |
+          cd core/platforms/
+          python3 twitch.py livethess > /tmp/thessaliatv.m3u8  # Generate .m3u8 file
+
+      - name: Ensure streams directory exists
+        run: mkdir -p ./streams
+
+      - name: Copy m3u8 file to new-repo
+        run: |
+          cp /tmp/thessaliatv.m3u8 ./streams/thessaliatv.m3u8
+
       - name: Configure Git
         run: |
           git config --global user.email "medialtdcontact@gmail.com"
-          git config --global user.name "med1alt"
-      
-      - name: Grab m3u8 URLs
-        id: grab_urls
-        run: |
-          cd ./core/platforms/
-          python3 twitch.py livethess > /tmp/thessalia.m3u8  # Save temporary .m3u8 file
-          cp /tmp/thessalia.m3u8 ../../streams/thessalia.m3u8  # Move .m3u8 file to streams directory
+          git config --global user.name "med1altd"
 
-      - name: Clone target repository
-        uses: actions/checkout@v2
-        with:
-          repository: <med1altd>/<channels>
-          token: ${{ secrets.GH_TOKEN }}  # Ensure GH_TOKEN has repo permissions
-
-      - name: Update .m3u8 file in target repository
+      - name: Commit and push changes to channels
         run: |
-          mkdir -p ./streams
-          cp ../../streams/thessaliatv.m3u8 ./streams/
           cd ./streams
-          git add thessaliatv.m3u8
-          git commit -m "Update .m3u8 file"
-          git push origin HEAD:main
+          git init
+          git add .
+          git commit -m "Update thassaliatv.m3u8"
+          git push https://github.com/med1altd/channels.git HEAD:main
