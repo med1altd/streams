@@ -31,6 +31,10 @@ jobs:
       - name: Make script executable
         run: chmod +x twitch.py
 
+      # Log the full path to the m3u8 file
+      - name: Log full path
+        run: echo "Full path: $(pwd)/../med1altd/channels/streams/thessalia.m3u8"
+        
       # Run twitch.py to generate m3u8 file directly into channels/streams directory in public repository
       - name: Update .m3u8 files
         run: |
