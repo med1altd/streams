@@ -2,19 +2,19 @@ import sys
 import requests
 import json
 
-def get_access_token(channel_name:str):
+def get_access_token(channel_name: str):
     """
-    Retrieves the access token and signature required to access the stream.
+    Ανάκτηση του access token και της υπογραφής που απαιτούνται για την πρόσβαση στο stream.
 
     Args:
-        channel_name (str): The name of the Twitch channel.
+        channel_name (str): Το όνομα του καναλιού στο Twitch.
 
     Returns:
-        tuple: A tuple containing the access token and signature if successful, or an empty tuple if an error occurred.
+        tuple: Ένα tuple που περιέχει το access token και την υπογραφή εάν είναι επιτυχές, ή ένα κενό tuple αν προέκυψε σφάλμα.
     """
     url = "https://gql.twitch.tv/gql"
     headers = {
-        'Client-ID': 'ue6666qo983tsx6so1t0vnawi233wa', #shoutout to streamlink
+        'Client-ID': 'ue6666qo983tsx6so1t0vnawi233wa',  # Το Client-ID της εφαρμογής σας στο Twitch
         'Content-Type': 'application/json'
     }
 
@@ -61,13 +61,13 @@ def get_access_token(channel_name:str):
 
 def get_stream_url(channel_name: str):
     """
-    Retrieves the URL of the stream for the given Twitch channel.
+    Ανάκτηση του URL του stream για το δοσμένο κανάλι στο Twitch.
 
     Args:
-        channel_name (str): The name of the Twitch channel.
+        channel_name (str): Το όνομα του καναλιού στο Twitch.
 
     Returns:
-        str or None: The URL of the stream if successful, or None if an error occurred.
+        str or None: Το URL του stream εάν είναι επιτυχές, ή None αν προέκυψε σφάλμα.
     """
     token, sig = get_access_token(channel_name)
 
@@ -92,13 +92,13 @@ def get_stream_url(channel_name: str):
 
 def remove_twitch_info_headers(response_text: str):
     """
-    Removes the Twitch-specific headers from the stream URL response.
+    Αφαίρεση των ειδικών κεφαλίδων του Twitch από την απόκριση με το URL του stream.
 
     Args:
-        response_text (str): The response text containing the stream URL.
+        response_text (str): Το κείμενο της απόκρισης που περιέχει το URL του stream.
 
     Returns:
-        str: The cleaned stream URL without Twitch-specific headers.
+        str: Το καθαρισμένο URL του stream χωρίς τις ειδικές κεφαλίδες του Twitch.
     """
     lines = response_text.split("\n")
     cleaned_lines = [line for line in lines if not line.startswith("#EXT-X-TWITCH-INFO") and not line.startswith("#EXT-X-MEDIA")]
@@ -107,10 +107,10 @@ def remove_twitch_info_headers(response_text: str):
 
 def main():
     """
-    The main function that is executed when the script is run.
+    Η κύρια συνάρτηση που εκτελείται όταν εκτελείται το script.
     """
     if len(sys.argv) < 2:
-        print("Usage: python script.py <channel_name>")
+        print("Usage: python twitch.py <channel_name>")
         sys.exit(1)
 
     channel_name = sys.argv[1]
