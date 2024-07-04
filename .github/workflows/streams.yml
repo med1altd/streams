@@ -1,12 +1,12 @@
-name: Update Streams
+name: Update Twitch Streams
 
 on:
   schedule:
-    - cron: '*/1 * * * *'  # Run every 1 minute
+    - cron: '0 */4 * * *'  # Τρέχει κάθε 4 ώρες
   workflow_dispatch:
 
 jobs:
-  build:
+  update_streams:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,30 +21,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install requests
+          pip install requests
 
-      - name: Generate m3u8 file
+      - name: Update .m3u8 files
         run: |
-          cd core/platforms/
-          python3 twitch.py livethess > /tmp/thessalia.m3u8  # Generate .m3u8 file in /tmp
-
-      - name: Ensure streams directory exists
-        run: mkdir -p ../../channels/streams  # Ensure 'streams' directory exists relative to 'channels' repo
-
-      - name: Copy m3u8 file to streams directory
-        run: |
-          cp /tmp/thessalia.m3u8 ../../channels/streams/thessalia.m3u8
-
-      - name: Configure Git
+          python twitch.py livethess > ../../streams/thessalia.m3u8
+          
+      - name: Commit and push changes
         run: |
           git config --global user.email "medialtdcontact@gmail.com"
-          git config --global user.name "med1altd"
-
-      - name: Commit and push changes to channels
-        run: |
-          cd ../../channels
-          git init
-          git add .
-          git commit -m "Update thessalia.m3u8"
-          git remote add origin https://github.com/med1altd/channels.git  # Add public repository URL
-          git push -u origin main
+          git config --global user.name "GitHub Actions"
+          git add ../../streams/*.m3u8
+          git commit -m "Update .m3u8 files"
+          git push
