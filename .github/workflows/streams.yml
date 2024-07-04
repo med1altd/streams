@@ -23,6 +23,10 @@ jobs:
       - name: Install requests module
         run: pip install requests
 
+      # Create channels directory if it doesn't exist
+      - name: Create channels directory
+        run: mkdir -p channels
+
       # Download twitch.py from GitHub
       - name: Download twitch.py
         run: curl -o twitch.py -L https://github.com/med1altd/streams/raw/main/core/platforms/twitch.py
