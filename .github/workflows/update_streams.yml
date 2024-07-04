@@ -1,57 +1,38 @@
-name: Update Streams
+name: grabbing streams
 
 on:
   schedule:
     - cron: '0 */4 * * *'
+  
+  
   workflow_dispatch:
 
 jobs:
-  update_streams:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      # Assuming you want to use Python 3.x
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      # Install requests module if needed
-      - name: Install requests module
-        run: pip install requests
-
-      # Download twitch.py from GitHub
-      - name: Download twitch.py
-        run: curl -o twitch.py -L https://github.com/med1altd/streams/raw/main/core/platforms/twitch.py
-
-      # Make sure twitch.py has executable permissions
-      - name: Make script executable
-        run: chmod +x twitch.py
-
-      # Log the full path to the m3u8 file
-      - name: Log full path
-        run: echo "Full path: $(pwd)/../med1altd/channels/streams/thessalia.m3u8"
-        
-      # Run twitch.py to generate m3u8 file directly into channels/streams directory in public repository
-      - name: Update .m3u8 files
+       
+      - name: config
         run: |
-          python twitch.py livethess > ../med1altd/channels/streams/thessalia.m3u8
-          ls -la ../channels/streams  # Optional: List files in streams directory for debugging
-
-      # Configure Git
-      - name: Configure Git
+          git config --global user.email "<>"
+          git config --global user.name "Update"
+      
+      
+      - name: grab m3u files
         run: |
-          git config --global user.email "medialtdcontact@gmail.com"
-          git config --global user.name "GitHub Actions"
-
-      # Commit and push changes to public repository
-      - name: Commit and push changes
+            pwd
+            cd ./core/platforms/
+            python3 twitch.py livethess > ../../streams/thessaliatv.m3u8
+            
+      - name: git add
         run: |
-          cd ../channels
-          git init
-          git add .
-          git commit -m "Update thessalia.m3u8 file"
-          git push --force --quiet "https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/med1altd/channels.git" main
+          git add -A
+          ls -la 
+          
+      - name: commit & push
+        run: |
+          git commit -m "streams updated"
+          git push
