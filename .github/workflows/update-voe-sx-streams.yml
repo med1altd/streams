@@ -38,7 +38,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          cd ../../../movies
+          cd ../../../channels
           git add kqrw17iyoemx.m3u8
           git commit -m "Update HLS file"
           git push
