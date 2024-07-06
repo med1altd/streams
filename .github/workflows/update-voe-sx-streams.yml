@@ -41,6 +41,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
+          cd core/platforms
           git checkout main  # Adjust branch name if necessary
           git add kqrw17iyoemx.m3u8
           git commit -m "Update HLS file"
