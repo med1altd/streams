@@ -1,4 +1,4 @@
-name: voe.sx
+name: Fetch HLS URL from voe.sx
 
 on:
   schedule:
@@ -35,16 +35,18 @@ jobs:
           sudo mv /tmp/chromedriver /usr/local/bin/chromedriver
           sudo chmod +x /usr/local/bin/chromedriver
 
-      - name: Run Python script with Selenium to fetch HLS URL
+      - name: Run Python script to fetch HLS URL
         working-directory: private-repo/core/platforms
         run: |
           mkdir -p ../../../streams/movies/
           python3 FetchAndDecodeHLS.py kqrw17iyoemx > ../../../streams/movies/tt22774688.m3u8 2>&1
           cat ../../../streams/movies/tt22774688.m3u8  # Print output for debugging
 
+      - name: Print Python version
+        run: python --version
+
       - name: Print installed Python packages
-        run: |
-          pip freeze
+        run: pip freeze
 
       - name: Commit and push changes
         working-directory: private-repo
