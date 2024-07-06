@@ -16,23 +16,17 @@ jobs:
           repository: med1altd/channels
           token: ${{ secrets.PRIVATE_REPO_PAT }}
 
-      - name: Set up JDK 11
+      - name: Set up JDK 11 and Maven
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
           java-version: '11'
-          java-package: jdk
-          architecture: x64
+          maven-version: '3.8.4'
 
-      - name: Compile and run Java program with dependencies
-        run: |
-          cd core/platforms
-          javac -cp "lib/*" FetchAndDecodeHLS.java
-          java -cp "lib/*:." FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
-          
+      - name: Build with Maven
+        run: mvn clean compile exec:java -Dexec.mainClass="FetchAndDecodeHLS" -Dexec.args="kqrw17iyoemx kqrw17iyoemx.m3u8"
         env:
-          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_PAT }}
 
       - name: Configure Git
         run: |
@@ -41,9 +35,9 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git checkout main  # Adjust branch name if necessary
+          cd ../../streams/movies
           git add kqrw17iyoemx.m3u8
           git commit -m "Update HLS file"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_REPO_PAT }}
