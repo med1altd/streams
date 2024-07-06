@@ -1,4 +1,4 @@
-name: grabbing streams
+name: twitch
 
 on:
   schedule:
