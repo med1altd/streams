@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     env:
       PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
 
