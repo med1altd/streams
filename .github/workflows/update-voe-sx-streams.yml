@@ -10,8 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout streams repository
+      - name: Checkout channels repository
         uses: actions/checkout@v2
+        with:
+          repository: med1altd/channels
+          token: ${{ secrets.PRIVATE_REPO_PAT }}
 
       - name: Set up JDK 11 and Maven
         uses: actions/setup-java@v2
@@ -21,14 +24,12 @@ jobs:
           java-package: jdk
           architecture: x64
 
-      - name: Navigate to channels repository
+      - name: Navigate to core/platforms directory
         run: cd channels/core/platforms/
-
-      - name: Compile with Maven
-        run: mvn clean package
-
-      - name: Run Java program
+        
+      - name: Compile and run Java program
         run: |
-          java -cp target/fetch-and-decode-hls-1.0-SNAPSHOT.jar com.example.FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
+          javac FetchAndDecodeHLS.java
+          java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
