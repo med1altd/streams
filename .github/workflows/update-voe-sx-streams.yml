@@ -1,16 +1,19 @@
 name: Fetch and Decode HLS
 
 on:
-  schedule:
-    - cron: '0 */4 * * *'  # Runs every 4 hours
-  workflow_dispatch:
+  workflow_dispatch:  # Manually trigger the workflow
+    inputs:
+      id_param:
+        description: 'ID parameter for FetchAndDecodeHLS'
+        required: true
+        default: 'kqrw17iyoemx'  # Default value for ID parameter
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout public repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up JDK 11
@@ -22,14 +25,22 @@ jobs:
 
       - name: Compile and run Java program
         run: |
-          cd streams/movies
-          java -cp $GITHUB_WORKSPACE/channels/core/platforms/target/fetch-and-decode-hls-1.0-SNAPSHOT.jar FetchAndDecodeHLS kqrw17iyoemx
+          cd core/platforms
+          javac FetchAndDecodeHLS.java
+          java FetchAndDecodeHLS ${{ github.event.inputs.id_param }}
           
         env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "medialtdcontact@gmail.com"
+          git config --global user.name "med1altd"
 
       - name: Commit and push changes
         run: |
+          git checkout main  # Adjust branch name if necessary
           git add kqrw17iyoemx.m3u8
           git commit -m "Update HLS file"
           git push
