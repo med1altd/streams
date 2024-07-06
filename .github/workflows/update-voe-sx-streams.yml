@@ -10,12 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout private repository
+      - name: Checkout public repository
         uses: actions/checkout@v2
-        with:
-          repository: med1altd/channels
-          ref: main
-          token: ${{ secrets.PRIVATE_REPO_PAT }}
 
       - name: Set up JDK 11
         uses: actions/setup-java@v2
@@ -26,17 +22,14 @@ jobs:
 
       - name: Compile and run Java program
         run: |
-          cd core/platforms
-          javac FetchAndDecodeHLS.java
-          java FetchAndDecodeHLS kqrw17iyoemx
+          cd streams/movies
+          java -cp $GITHUB_WORKSPACE/channels/core/platforms/target/fetch-and-decode-hls-1.0-SNAPSHOT.jar FetchAndDecodeHLS kqrw17iyoemx
           
         env:
-          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Commit and push changes
         run: |
-          cd ../movies
           git add kqrw17iyoemx.m3u8
           git commit -m "Update HLS file"
           git push
