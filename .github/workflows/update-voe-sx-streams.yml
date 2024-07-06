@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout channels repository
+      - name: Checkout private repository
         uses: actions/checkout@v2
         with:
-          repository: med1altd/channels
-          token: ${{ secrets.PRIVATE_REPO_PAT }}
+          repository: med1altd/channels  # Replace with your actual private repository URL
+          token: ${{ secrets.PRIVATE_REPO_PAT }}  # Token for accessing the private repository
 
-      - name: Set up JDK 11 and Maven
+      - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
@@ -24,12 +24,14 @@ jobs:
           java-package: jdk
           architecture: x64
 
-      - name: Navigate to core/platforms directory
-        run: cd channels/core/platforms/
-        
+      - name: Verify directory structure
+        run: ls core/platforms  # Check if the directory exists
+
       - name: Compile and run Java program
         run: |
+          cd core/platforms
           javac FetchAndDecodeHLS.java
           java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
         env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
