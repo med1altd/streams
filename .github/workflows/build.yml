@@ -1,0 +1,31 @@
+name: Java Build and Run
+
+on:
+  push:
+    branches:
+      - main  # adjust to your main branch name
+  workflow_dispatch:  # allow manual triggering of workflow
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Checkout your repository's code
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'  # Adjust to your Java version
+
+      - name: Build with Maven
+        run: mvn clean install -f channels/core/platforms/pom.xml
+
+      - name: Run Java Program
+        run: |
+          cd channels/core/platforms/target/classes
+          java -cp .:../../../streams/movies:../../../../../opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64/lib/* com.example.FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
+
+      - name: Copy output file
+        run: cp kqrw17iyoemx.m3u8 ../../../../streams/movies/
