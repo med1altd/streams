@@ -24,12 +24,14 @@ jobs:
           java-package: jdk
           architecture: x64
 
-      - name: Compile and run Java program
+      - name: Compile and run Java program with dependencies
         run: |
-          cd core/platforms  # Adjust path if necessary
-          javac FetchAndDecodeHLS.java
-          java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
+          cd core/platforms
+          javac -cp "lib/*" FetchAndDecodeHLS.java
+          java -cp "lib/*:." FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
+          
         env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
