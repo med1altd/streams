@@ -34,12 +34,12 @@ jobs:
 
       - name: Compile Java program
         run: |
-          cd private-repo
+          cd private-repo/core/platforms
           javac FetchAndDecodeHLS.java
 
       - name: Run Java program
         run: |
-          cd private-repo
+          cd private-repo/core/platforms
           java FetchAndDecodeHLS kqrw17iyoemx
 
       - name: Configure Git
