@@ -1,4 +1,4 @@
-name: Fetch HLS URL from voe.sx
+name: Fetch and Decode HLS
 
 on:
   schedule:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout streams repository
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Set up Python
@@ -23,34 +23,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests selenium
 
-      - name: Install Chrome browser and ChromeDriver
-        run: |
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
-          wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
-          unzip /tmp/chromedriver.zip -d /tmp
-          sudo mv /tmp/chromedriver /usr/local/bin/chromedriver
-          sudo chmod +x /usr/local/bin/chromedriver
+      - name: Create movies directory
+        run: mkdir -p streams/movies
 
       - name: Run Python script to fetch HLS URL
-        working-directory: private-repo/core/platforms
+        working-directory: streams/movies
         run: |
-          mkdir -p ../../../streams/movies/
-          python3 FetchAndDecodeHLS.py kqrw17iyoemx > ../../../streams/movies/tt22774688.m3u8 2>&1
-          cat ../../../streams/movies/tt22774688.m3u8  # Print output for debugging
+          python3 ../../private-repo/core/platforms/FetchAndDecodeHLS.py kqrw17iyoemx > tt22774688.m3u8 2>&1
+          cat tt22774688.m3u8  # Print output for debugging
 
       - name: Print Python version
         run: python --version
 
-      - name: Print installed Python packages
-        run: pip freeze
-
       - name: Commit and push changes
-        working-directory: private-repo
         run: |
-          git add -A
-          git commit -m "Update streams"
-          git push
+          git -C private-repo add .
+          git -C private-repo commit -m "Update streams"
+          git -C private-repo push
