@@ -1,23 +1,30 @@
 name: voe.sx
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    env:
+      PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
 
     steps:
-      - name: Checkout streams repository
+      - name: Checkout current repository
         uses: actions/checkout@v2
 
-      - name: Download FetchAndDecodeHLS.java
+      - name: Create directory structure
+        run: mkdir -p channels/core/platforms
+
+      - name: Download FetchAndDecodeHLS.java from private repository
         run: |
-          mkdir -p channels/core/platforms
-          curl -fsSL -o channels/core/platforms/FetchAndDecodeHLS.java https://github.com/med1altd/channels/raw/main/core/platforms/FetchAndDecodeHLS.java
+          curl -fsSL -o channels/core/platforms/FetchAndDecodeHLS.java \
+            -H "Authorization: token $PRIVATE_REPO_PAT" \
+            https://raw.githubusercontent.com/med1altd/channels/main/core/platforms/FetchAndDecodeHLS.java
+
+      - name: Display fetched file
+        run: cat channels/core/platforms/FetchAndDecodeHLS.java
 
       - name: Set up JDK 11
         uses: actions/setup-java@v2
@@ -31,17 +38,3 @@ jobs:
           javac FetchAndDecodeHLS.java
           java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
           cp kqrw17iyoemx.m3u8 ../../../streams/movies/
-
-      - name: Configure Git
-        run: |
-          git config --global user.email "medialtdcontact@gmail.com"
-          git config --global user.name "med1altd"
-
-      - name: Commit and push changes
-        run: |
-          cd ../../../streams/movies
-          git add kqrw17iyoemx.m3u8
-          git commit -m "Update HLS file"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
