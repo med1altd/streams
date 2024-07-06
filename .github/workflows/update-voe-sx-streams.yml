@@ -1,60 +1,43 @@
-import requests
-import base64
+name: voe.sx
 
-def fetch_html_content(id):
-    url = f"https://voe.sx/{id}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        raise Exception(f"Failed to fetch HTML content. Status code: {response.status_code}")
+on:
+  schedule:
+    - cron: '0 */4 * * *'  # Run every 4 hours
+  workflow_dispatch:
 
-def fetch_redirected_url(html_content):
-    # Extract the new URL from the script tag in the HTML content
-    start_index = html_content.find("window.location.href = '") + len("window.location.href = '")
-    end_index = html_content.find("'", start_index)
-    new_url = html_content[start_index:end_index]
-    return new_url
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-def fetch_hls_url_from_redirected_url(redirected_url):
-    response = requests.get(redirected_url)
-    if response.status_code == 200:
-        return response.text
-    elif response.status_code == 403:
-        raise Exception(f"Forbidden to fetch HLS URL from redirected URL. Status code: {response.status_code}")
-    else:
-        raise Exception(f"Failed to fetch HLS URL from redirected URL. Status code: {response.status_code}")
+    steps:
+      - name: Checkout streams repository
+        uses: actions/checkout@v2
 
-def decode_base64(base64_encoded_string):
-    # Ensure the base64_encoded_string length is a multiple of 4
-    padding_needed = len(base64_encoded_string) % 4
-    if padding_needed > 0:
-        base64_encoded_string += '=' * (4 - padding_needed)  # Add padding if necessary
-    decoded_bytes = base64.b64decode(base64_encoded_string)
-    return decoded_bytes.decode('utf-8')
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
-if __name__ == "__main__":
-    import sys
-    if len(sys.argv) < 2:
-        print("Usage: python FetchAndDecodeHLS.py <id>")
-        sys.exit(1)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
 
-    id = sys.argv[1]
+      - name: Clone private repository
+        env:
+          PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
+        run: |
+          git clone https://med1altd:${{ secrets.PRIVATE_REPO_PAT }}@github.com/med1altd/channels.git private-repo
 
-    try:
-        html_content = fetch_html_content(id)
-        redirected_url = fetch_redirected_url(html_content)
-        hls_url = fetch_hls_url_from_redirected_url(redirected_url)
+      - name: Run Python script to grab m3u files
+        working-directory: private-repo/core/platforms
+        run: |
+          mkdir -p ../../../streams/movies/
+          python3 FetchAndDecodeHLS.py kqrw17iyoemx > ../../../streams/movies/tt22774688.m3u8
 
-        # Check if hls_url is base64 encoded
-        if hls_url.startswith("data:"):
-            hls_url = hls_url.split(",")[1]  # Extract base64 encoded part
-
-        decoded_hls_url = decode_base64(hls_url)
-        
-        # Print the decoded HLS URL for testing purposes
-        print(f"Decoded HLS URL for {id}: {decoded_hls_url}")
-
-    except Exception as e:
-        print(f"Error: {e}")
-        sys.exit(1)
+      - name: Commit and push changes
+        working-directory: private-repo
+        run: |
+          git add -A
+          git commit -m "Update streams"
+          git push
