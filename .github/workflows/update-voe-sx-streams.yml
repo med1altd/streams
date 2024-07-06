@@ -13,7 +13,7 @@ jobs:
       - name: Checkout private repository
         uses: actions/checkout@v2
         with:
-          repository: med1altd/channels  # Replace with your actual private repository URL
+          repository: med1altd/channels  # Replace with your private repository URL
           token: ${{ secrets.PRIVATE_REPO_PAT }}  # Token for accessing the private repository
 
       - name: Set up JDK 11
@@ -24,14 +24,21 @@ jobs:
           java-package: jdk
           architecture: x64
 
-      - name: Verify directory structure
-        run: ls core/platforms  # Check if the directory exists
-
       - name: Compile and run Java program
         run: |
           cd core/platforms
           javac FetchAndDecodeHLS.java
-          java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
+          java FetchAndDecodeHLS kqrw17iyoemx
+          
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push changes
+        run: |
+          cd ../../streams/movies
+          git add kqrw17iyoemx.m3u8
+          git commit -m "Update HLS file"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
