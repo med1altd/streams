@@ -2,7 +2,7 @@ name: voe.sx
 
 on:
   schedule:
-    - cron: '0 */4 * * *'
+    - cron: '0 */4 * * *'  # Runs every 4 hours
   workflow_dispatch:
 
 jobs:
@@ -26,8 +26,9 @@ jobs:
 
       - name: Compile and run Java program
         run: |
-          cd private-repo/core/platforms
-          mvn compile exec:java -Dexec.mainClass="com.example.FetchAndDecodeHLS" -Dexec.args="kqrw17iyoemx kqrw17iyoemx.m3u8"
+          cd core/platforms  # Adjust path if necessary
+          javac FetchAndDecodeHLS.java
+          java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -38,7 +39,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          cd ../../../channels
+          git checkout main  # Adjust branch name if necessary
           git add kqrw17iyoemx.m3u8
           git commit -m "Update HLS file"
           git push
