@@ -35,6 +35,9 @@ jobs:
       - name: Print Python version
         run: python --version
 
+      - name: Print environment variables
+        run: env
+
       - name: Commit and push changes
         run: |
           git -C private-repo add .
