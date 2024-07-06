@@ -23,12 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests selenium
 
-      - name: Clone private repository
-        env:
-          PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
-        run: |
-          git clone https://med1altd:${{ secrets.PRIVATE_REPO_PAT }}@github.com/med1altd/channels.git private-repo
-
       - name: Install Chrome browser and ChromeDriver
         run: |
           wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
@@ -45,7 +39,12 @@ jobs:
         working-directory: private-repo/core/platforms
         run: |
           mkdir -p ../../../streams/movies/
-          python3 FetchAndDecodeHLS.py kqrw17iyoemx > ../../../streams/movies/tt22774688.m3u8
+          python3 FetchAndDecodeHLS.py kqrw17iyoemx > ../../../streams/movies/tt22774688.m3u8 2>&1
+          cat ../../../streams/movies/tt22774688.m3u8  # Print output for debugging
+
+      - name: Print installed Python packages
+        run: |
+          pip freeze
 
       - name: Commit and push changes
         working-directory: private-repo
