@@ -1,40 +1,37 @@
 name: voe.sx
 
 on:
+  schedule:
+    - cron: '0 */4 * * *'  # Run every 4 hours
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
-
     steps:
-      - name: Checkout current repository
+      - name: Checkout streams repository
         uses: actions/checkout@v2
 
-      - name: Create directory structure
-        run: mkdir -p channels/core/platforms
-
-      - name: Download FetchAndDecodeHLS.java from private repository
-        run: |
-          curl -fsSL -o channels/core/platforms/FetchAndDecodeHLS.java \
-            -H "Authorization: token $PRIVATE_REPO_PAT" \
-            https://raw.githubusercontent.com/med1altd/channels/main/core/platforms/FetchAndDecodeHLS.java
-
-      - name: Display fetched file
-        run: cat channels/core/platforms/FetchAndDecodeHLS.java
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          distribution: 'adopt'
-          java-version: '11'
+          python-version: '3.x'
 
-      - name: Compile and run Java program
+      - name: Clone private repository
+        env:
+          PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
         run: |
-          cd channels/core/platforms
-          javac FetchAndDecodeHLS.java
-          java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
-          cp kqrw17iyoemx.m3u8 ../../../streams/movies/
+          git clone https://med1altd:${{ secrets.PRIVATE_REPO_PAT }}@github.com/med1altd/channels.git private-repo
+
+      - name: Run Python script to grab m3u files
+        working-directory: private-repo/core/platforms
+        run: |
+          python3 FetchAndDecodeHLS.py kqrw17iyoemx > ../../../streams/movies/tt22774688.m3u8
+
+      - name: Commit and push changes
+        run: |
+          cd ..
+          git add -A
+          git commit -m "Update streams"
+          git push
