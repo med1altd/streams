@@ -10,34 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout private repository
+      - name: Checkout streams repository
         uses: actions/checkout@v2
-        with:
-          repository: med1altd/channels
-          token: ${{ secrets.PRIVATE_REPO_PAT }}
 
       - name: Set up JDK 11 and Maven
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
           java-version: '11'
-          maven-version: '3.8.4'
+          java-package: jdk
+          architecture: x64
 
-      - name: Build with Maven
-        run: mvn clean compile exec:java -Dexec.mainClass="FetchAndDecodeHLS" -Dexec.args="kqrw17iyoemx kqrw17iyoemx.m3u8"
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_PAT }}
+      - name: Navigate to channels repository
+        run: cd channels/core/platforms/
 
-      - name: Configure Git
+      - name: Compile with Maven
+        run: mvn clean package
+
+      - name: Run Java program
         run: |
-          git config --global user.email "medialtdcontact@gmail.com"
-          git config --global user.name "med1altd"
-
-      - name: Commit and push changes
-        run: |
-          cd ../../streams/movies
-          git add kqrw17iyoemx.m3u8
-          git commit -m "Update HLS file"
-          git push
+          java -cp target/fetch-and-decode-hls-1.0-SNAPSHOT.jar com.example.FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
         env:
-          GITHUB_TOKEN: ${{ secrets.PUBLIC_REPO_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
