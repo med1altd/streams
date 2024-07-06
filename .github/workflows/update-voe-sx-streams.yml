@@ -1,4 +1,4 @@
-name: Run FetchAndDecodeHLS
+name: voe.sx
 
 on:
   push:
@@ -14,11 +14,10 @@ jobs:
       - name: Checkout streams repository
         uses: actions/checkout@v2
 
-      - name: Checkout channels repository
-        uses: actions/checkout@v2
-        with:
-          repository: med1altd/channels  # Replace with your private repository URL
-          token: ${{ secrets.GH_TOKEN }}  # GitHub token with access to private repo
+      - name: Download FetchAndDecodeHLS.java
+        run: |
+          mkdir -p channels/core/platforms
+          curl -fsSL -o channels/core/platforms/FetchAndDecodeHLS.java https://github.com/med1altd/channels/raw/main/core/platforms/FetchAndDecodeHLS.java
 
       - name: Set up JDK 11
         uses: actions/setup-java@v2
@@ -31,7 +30,7 @@ jobs:
           cd channels/core/platforms
           javac FetchAndDecodeHLS.java
           java FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
-          cp kqrw17iyoemx.m3u8 ../../streams/movies/
+          cp kqrw17iyoemx.m3u8 ../../../streams/movies/
 
       - name: Configure Git
         run: |
@@ -40,7 +39,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          cd ../../streams/movies
+          cd ../../../streams/movies
           git add kqrw17iyoemx.m3u8
           git commit -m "Update HLS file"
           git push
