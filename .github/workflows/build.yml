@@ -20,13 +20,16 @@ jobs:
           java-version: '11'  # Adjust to your Java version
           distribution: 'adopt'  # Specify the distribution type (e.g., adopt, openjdk)
 
-      - name: Build with Maven
-        run: mvn clean install -f channels/core/platforms/pom.xml
-
-      - name: Run Java Program
+      - name: Compile FetchAndDecodeHLS.java
         run: |
-          cd channels/core/platforms/target/classes
-          java -cp .:../../../streams/movies:../../../../../opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64/lib/* com.example.FetchAndDecodeHLS kqrw17iyoemx kqrw17iyoemx.m3u8
+          cd channels/core/platforms
+          javac -cp ".:lib/*" FetchAndDecodeHLS.java
 
-      - name: Copy output file
-        run: cp kqrw17iyoemx.m3u8 ../../../../streams/movies/
+      - name: Run FetchAndDecodeHLS.java
+        run: |
+          cd channels/core/platforms
+          java -cp ".:lib/*" FetchAndDecodeHLS kqrw17iyoemx
+
+      - name: Copy output file to streams repository
+        run: |
+          cp channels/core/platforms/kqrw17iyoemx.m3u8 ../streams/movies/
