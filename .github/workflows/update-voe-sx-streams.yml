@@ -1,8 +1,6 @@
 name: Fetch and Decode HLS
 
 on:
-  schedule:
-    - cron: '0 */4 * * *'  # Run every 4 hours
   workflow_dispatch:
 
 jobs:
