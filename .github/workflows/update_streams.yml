@@ -14,8 +14,8 @@ jobs:
 
       - name: config
         run: |
-          git config --global user.email "<>"
-          git config --global user.name "Update"
+          git config --global user.email "medialtdcontact@gmail.com"
+          git config --global user.name "med1altd"
 
       - name: checkout private repository
         env:
